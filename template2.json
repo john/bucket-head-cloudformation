@@ -41,6 +41,33 @@
           ]
         }
       }
+    },
+
+    "TranscodingComplete": {
+      "Type": "AWS::SNS::Topic",
+      "Properties" : {
+        "Subscription": [ {
+            "Protocol": "lambda",
+            "Endpoint": {"Fn::GetAtt": ["TranscodeLambda", "Arn"]}
+          }, {
+            "Protocol": "email",
+            "Endpoint": "john@fnnny.com",
+          } ],
+      }
+    },
+
+    "TranscodingFailed": {
+      "Type": "AWS::SNS::Topic",
+      "Properties" : {
+        "Subscription": [ {
+            "Protocol": "email",
+            "Endpoint": "john@fnnny.com",
+          } ],
+      }
+    },
+
+    "TranscodedFiles": {
+      "Type": "AWS::S3::Bucket",
     }
   }
 }
