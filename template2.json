@@ -10,9 +10,24 @@
         },
         "Description": "Get uploaded files from S3, call Elastic Transcoder",
         "Runtime": "python2.7",
-        "Handler": "lambda_handler",
+        "Handler": "BucketHeadTranscodeUploadLambda.lambda_handler",
         "Role": "arn:aws:iam::402153944964:role/service-role/bhead-admin-role",
         "Timeout": 120,
+      }
+    },
+    
+    "UpdateDynamoDbLambda": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": "bh-lambdas",
+          "S3Key": "BucketHeadUpdateDynamoDbLambda.py.zip"
+        },
+        "Description": "Receive data from Elastic Transcode, update DynamoDB",
+        "Runtime": "python2.7",
+        "Handler": "BucketHeadUpdateDynamoDbLambda.lambda_handler",
+        "Role": "arn:aws:iam::402153944964:role/service-role/bhead-admin-role",
+        "Timeout": 120
       }
     },
 
@@ -28,7 +43,7 @@
         }
       }
     },
-
+    
     "UploadedFiles": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
@@ -41,6 +56,10 @@
           ]
         }
       }
+    },
+    
+    "TranscodedFiles": {
+      "Type": "AWS::S3::Bucket"
     },
 
     "TranscodingComplete": {
@@ -65,9 +84,46 @@
           } ],
       }
     },
+    
+    "Videos": {
+      "Type" : "AWS::DynamoDB::Table",
+      "Properties" : {
+        "AttributeDefinitions" : [
+          {
+            "AttributeName": "VideoId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema" : [
+          {
+             "AttributeName": "VideoId",
+             "KeyType": "HASH"
+           }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        }
 
-    "TranscodedFiles": {
-      "Type": "AWS::S3::Bucket",
+      }
+    },
+    
+    "RestApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "BucketHeadAPI",
+        "Description": "API used for Greeting requests",
+        "FailOnWarnings" : true
+      }
+    },
+    
+    "VideosResource": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "RestApiId": {"Ref": "RestApi"},
+        "ParentId": {"Fn::GetAtt": ["RestApi", "RootResourceId"]},
+        "PathPart": "video"
+      }
     }
   }
 }

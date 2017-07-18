@@ -12,7 +12,7 @@
         "Runtime": "python2.7",
         "Handler": "lambda_handler",
         "Role": "arn:aws:iam::402153944964:role/service-role/bhead-admin-role",
-        "Timeout": 120,
+        "Timeout": 120
       }
     },
 
@@ -30,7 +30,30 @@
     },
 
     "UploadedFiles": {
-      "Type": "AWS::S3::Bucket",
+      "Type": "AWS::S3::Bucket"
+    },
+    
+    "Videos": {
+      "Type" : "AWS::DynamoDB::Table",
+      "Properties" : {
+        "AttributeDefinitions" : [
+          {
+            "AttributeName": "VideoId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema" : [
+          {
+             "AttributeName": "VideoId",
+             "KeyType": "HASH"
+           }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        }
+
+      }
     }
   }
 }
