@@ -12,7 +12,7 @@
         "Runtime": "python2.7",
         "Handler": "BucketHeadTranscodeUploadLambda.lambda_handler",
         "Role": "arn:aws:iam::402153944964:role/service-role/bhead-admin-role",
-        "Timeout": 120,
+        "Timeout": 120
       }
     },
     
@@ -65,23 +65,23 @@
     "TranscodingComplete": {
       "Type": "AWS::SNS::Topic",
       "Properties" : {
-        "Subscription": [ {
+        "Subscription": [{
             "Protocol": "lambda",
             "Endpoint": {"Fn::GetAtt": ["TranscodeLambda", "Arn"]}
           }, {
             "Protocol": "email",
-            "Endpoint": "john@fnnny.com",
-          } ],
+            "Endpoint": "john@fnnny.com"
+          }]
       }
     },
 
     "TranscodingFailed": {
       "Type": "AWS::SNS::Topic",
       "Properties" : {
-        "Subscription": [ {
+        "Subscription": [{
             "Protocol": "email",
-            "Endpoint": "john@fnnny.com",
-          } ],
+            "Endpoint": "john@fnnny.com"
+          }]
       }
     },
     
@@ -123,6 +123,39 @@
         "RestApiId": {"Ref": "RestApi"},
         "ParentId": {"Fn::GetAtt": ["RestApi", "RootResourceId"]},
         "PathPart": "video"
+      }
+    },
+    
+    "VideosGetMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "RestApiId": { "Ref": "RestApi" },
+        "ResourceId": {"Ref": "VideosResource"},
+        "MethodResponses": [{
+          "StatusCode": 200
+        }],
+        "HttpMethod": "GET",
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "Type": "AWS",  
+          "IntegrationHttpMethod": "POST",
+          "Uri": {
+            "Fn::Join": [ "",
+             [
+               "arn:aws:apigateway:",
+               {"Ref": "AWS::Region"},
+               "::",
+               {"Ref": "RestApi"},
+               ":/test/",
+               {"Ref": "VideosResource"},
+               "/*"
+             ] 
+            ]
+          },    
+          "IntegrationResponses": [{
+            "StatusCode": 200
+          }]
+        }
       }
     }
   }
