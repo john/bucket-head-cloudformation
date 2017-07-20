@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  RestApi:
+     Type: AWS::Serverless::Api
+     Properties:
+        StageName: prod
+        DefinitionUri: api.yml
+
+  # Videos2:
+  #    Type: AWS::Serverless::SimpleTable
+  #    Properties:
+  #       PrimaryKey:
+  #          Name: VideoId
+  #          Type: String
+  #       ProvisionedThroughput:
+  #          ReadCapacityUnits: 1
+  #          WriteCapacityUnits: 1
+  #       Events:
+  #         GetResource:
+  #           Type: Api
+  #           Properties:
+  #             Path: /videos/{VideoId}
+  #             Method: get
+
+  Videos2:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: VideoId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: VideoId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        Events:
+          GetResource:
+            Type: Api
+            Properties:
+              Path: /videos/{VideoId}
+              Method: get
+
+  # TranscodeLambda:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: BucketHeadTranscodeUploadLambda.lambda_handler
+  #     Runtime: python2.7
+  #     CodeUri: s3://bh-lambdas/BucketHeadTranscodeUploadLambda.py.zip
+  #     Events:
+  #       MyUploadEvent:
+  #         Type: S3
+  #         Properties:
+  #           Id: !Ref UploadedFiles
+  #           Events: Create
+  #
+  # UploadedFiles:
+  #   Type: AWS::S3::Bucket

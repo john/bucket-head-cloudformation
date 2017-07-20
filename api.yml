@@ -1,0 +1,101 @@
+swagger: '2.0'
+info:
+  description: 'BucketHead, the API'
+  version: '0.1'
+  title: BucketHead API
+  termsOfService: ''
+  contact:
+    email: johmcgr@amazon.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+host: fryolator.com
+basePath: /v1
+tags:
+  - name: video
+    description: Video uploads from the playing field
+schemes:
+  - http
+paths:
+  /videos:
+    get:
+      tags:
+        - video
+      summary: Get all videos
+      description: Returns all videos
+      operationId: getVideos
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Video'
+        '400':
+          description: Trouble. Trouble with a capital T.
+        '404':
+          description: Nhuthin
+  '/videos/{VideoId}':
+    get:
+      tags:
+        - video
+      summary: Find video by ID
+      description: Returns a single video
+      operationId: getVideoById
+      produces:
+        - application/json
+      parameters:
+        - name: VideoId
+          in: path
+          description: ID of video to return
+          required: true
+          type: string
+          format: int64
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Video'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Video not found
+      security:
+        - api_key: []
+securityDefinitions:
+  petstore_auth:
+    type: oauth2
+    authorizationUrl: 'http://petstore.swagger.io/oauth/dialog'
+    flow: implicit
+    scopes:
+      'write:pets': modify pets in your account
+      'read:pets': read your pets
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+definitions:
+  Video:
+    type: object
+    required:
+      - VideoId
+    properties:
+      VideoId:
+        type: integer
+        format: int64
+      name:
+        type: string
+        example: doggie
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
